@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tic-tac-toe</title>
+  </head>
+  <body>
+    Messages received:
+    <script type="text/javascript"  src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var host = location.origin.replace(/^http/, 'ws');
+      var socket = io.connect(host);
+      socket.on('connect', function () {
+        socket.on('message', function (msg) {
+          var message = document.createElement('div');
+          message.innerHTML = msg;
+          document.body.appendChild(message);
+        });
+      });
+    </script>
+  </body>
+</html>
