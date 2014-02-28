@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "socket.io": "*",
-    "express": "3.x"
+    "express": "3.x",
+    "jasmine-node": "*"
   },
   "engines": {
     "node": "0.10.x",
