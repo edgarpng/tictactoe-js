@@ -1,70 +1,79 @@
 describe('The Tic-tac-toe game', function(){
 
-  var game;
+  var game, playerX, playerO;
 
-  function randomPosition(){
-    return Math.floor(Math.random() * 9);
-  }
-
-  beforeAll(function(){
+  beforeEach(function(){
     game = new TicTacToe();
-  }
-
-  it('starts with an empty board', function(){
-    var i, position;
-    for(i = 0; i < game.board.length; i++){
-      position = game.board[i];
-      expect(position).not.toBe('x');
-      expect(position).not.toBe('o');
-    }
+    playerX = game.getPlayerX();
+    playerO = game.getPlayerO();
   });
 
-  it('keeps the state between turns', function(){
-    var position0 = randomPosition();
-    var position1 = randomPosition();
-    game.set(position0, 'x');
-    expect(game.get(position0)).toBe('x');
-    game.set(position1, 'o');
-    expect(game.get(position1)).toBe('o');
-  });
-
-  it('does not let you play one turn after the other', function(){
-    game.set(randomPosition(), 'x');
-    var illegalTurn = function(){
-      game.set(randomPosition(), 'x');
+  it('starts with the X player', function(){
+    var xTurn = function(){
+      playerX.choose(0);
     };
-    expect(illegalTurn).toThrow();
-  });
-
-  it('does not let you use the spot twice', function(){
-    var position = randomPosition();
-    game.set(position, 'x');
-    game.set(randomPosition(), 'o');
-    var illegalTurn = function(){
-      game.set(position, 'x');
+    var yTurn = function(){
+      playerO.choose(1);
     };
-    expect(illegalTurn).toThrow();
+    expect(yTurn).toThrow();
+    expect(xTurn).not.toThrow();
   });
 
-  it('lets you know when you won', function(){
+  it('does not let the same player play twice in a row', function(){
+    var xTurn = function(){
+      playerX.choose(0);
+    };
+    xTurn();
+    expect(xTurn).toThrow();
+  });
+
+  it('does not let a player use the spot twice', function(){
+    var xTurn = function(){
+      playerX.choose(0);
+    };
+    var yTurn = function(){
+      playerO.choose(1);
+    };
+    xTurn();
+    yTurn();
+    expect(xTurn).toThrow();
+  });
+
+  it('lets you know when you win', function(){
     var callback = jasmine.createSpy('callback');
-    var x = game.getPlayerX();
-    var o = game.getPlayerO();
-    game.on('x-win', callback);
-    x.choose(0);
-    o.choose(1);
-    x.choose(4);
-    o.choose(2);
-    x.choose(8);
-    expect(callback).toHaveBeenCalledWith(jasmine.any('Array'), jasmine.any('Array'));//Full board and winning move, e.g. [0,4,8]
+    playerX.on('win', callback);
+    playerX.choose(0);
+    playerO.choose(1);
+    playerX.choose(4);
+    playerO.choose(2);
+    playerX.choose(8);
+    expect(callback).toHaveBeenCalledWith(jasmine.any('Array'));//winning move, e.g. [0,4,8]
   });
 
-  it('lets you know when you lost', function(){
-
+  it('lets you know when you lose', function(){
+    var callback = jasmine.createSpy('callback');
+    playerX.on('lose', callback);
+    playerX.choose(0);
+    playerO.choose(1);
+    playerX.choose(2);
+    playerO.choose(4);
+    playerX.choose(3);
+    playerO.choose(7);
+    expect(callback).toHaveBeenCalledWith(jasmine.any('Array'));//losing move
   });
 
   it('lets you know when there is a draw', function(){
-    
+    var callback = jasmine.createSpy('callback');
+    playerX.on('draw', callback);
+    playerX.choose(0);
+    playerO.choose(2);
+    playerX.choose(1);
+    playerO.choose(3);
+    playerX.choose(5);
+    playerO.choose(4);
+    playerX.choose(6);
+    playerO.choose(7);
+    playerX.choose(8);
+    expect(callback).toHaveBeenCalled();
   });
-
 });
